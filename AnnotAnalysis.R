@@ -1,5 +1,3 @@
-
-
 inputDir<-"~/GitHub/CirQuestDSV/" #put input directory here.
 
 FILTER=0.005 # change for labeling
@@ -24,7 +22,6 @@ nameList<-NULL
 compq20<-NULL
 
 for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Read annotated CirSeq output file
-  
   par (mfrow=c(1,1), pch = 16, mar= c(5,5,5,5),col = rgb(0,0,0,0.5), las = 1 )
   name<-strsplit2(strsplit2(q20file,"_annot.txt")[1],"//")[2]
   q20<-read.delim(q20file,head=T)
@@ -35,18 +32,17 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   
   assign(name,read.delim(q20file,sep="\t"))  #?
   q20<-get(name)
-  pdf(paste(inputDir,name,"_ManhattanPlots.pdf"),width=7,height=5)
-  plot(log10(filter$freq) ~ filter$ntpos, main = name,ylim = c(-5.5,0.5),ylab = "Allele Frequency",xlab = "Genome Position",
-       pch = 16,
-       cex = ifelse(filter$count>4,(4.3+log10(filter$freq))/5+0.2,0.05),
-       col =  ifelse(filter$synNonsyn=="U", rgb(0,0,0,0.3), 
-              ifelse(filter$synNonsyn=="S", rgb(0,0,.8,0.5),
-              ifelse(filter$synNonsyn=="NS", rgb(0.8,0,0,0.6),'green'))))
-  abline(h=log10(FILTER))
-  biggies<-filter[filter$freq>FILTER,] #greater than 5e-3 (1 in 200)
-  text(cex=0.4,log10(biggies$freq)~biggies$ntpos, labels=paste(biggies$wtRes,biggies$resPos,biggies$muRes,sep=""),pos=2)
   
-  legend(x=0,y=0,legend = c("S","NS","UTR"),col = c(rgb(0,0,0.8,0.5),rgb(0.8,0,0.6),rgb(0,0,0,0.3)), pch = 16,cex = 0.7)
+  pdf(paste(inputDir,name,"_ManhattanPlot.pdf"),width=7,height=5)
+  Qf<-ggplot(filter)
+  
+  PP<-Qf+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=.6)+
+    ylim(1e-6,1)+geom_text(cex=2,position = position_nudge(y=.15),data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=paste(wtRes,resPos,muRes)))+
+    scale_y_log10()+ggtitle(name)+scale_size(trans = "sqrt",range=c(.5,2.5))+
+    theme_light()+scale_color_brewer(palette = "Set1")
+  
+  ggsave(filename = paste(inputDir,name,"_ManhattanPlot.pdf"),
+         device = 'pdf',PP)
   
   write.csv(file=paste(inputDir,"/",name,"_0.005CO.csv",sep=""),filter[order(filter$freq,decreasing = T),])
   
