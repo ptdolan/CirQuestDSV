@@ -39,7 +39,7 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   PP<-Qf+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=.6)+
     ylim(1e-6,1)+geom_text(cex=2,position = position_nudge(y=.15),data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=paste(wtRes,resPos,muRes)))+
     scale_y_log10()+ggtitle(name)+scale_size(trans = "sqrt",range=c(.5,2.5))+
-    theme_light()+scale_color_brewer(palette = "Set1")
+    theme_classic()+ylab("Frequency")+xlab("Genome Position")+scale_color_brewer(palette = "Set1")
   
   ggsave(filename = paste(inputDir,name,"_ManhattanPlot.pdf"),
          device = 'pdf',PP)
