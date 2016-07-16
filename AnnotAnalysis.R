@@ -33,13 +33,13 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   assign(name,read.delim(q20file,sep="\t"))  #?
   q20<-get(name)
   
-  pdf(paste(inputDir,name,"_ManhattanPlot.pdf"),width=7,height=5)
+  #pdf(paste(inputDir,name,"_ManhattanPlot.pdf"),width=7,height=5)
   Qf<-ggplot(filter)
   
   PP<-Qf+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=.6)+
     ylim(1e-6,1)+geom_text(cex=2,position = position_nudge(y=.15),data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=paste(wtRes,resPos,muRes)))+
     scale_y_log10()+ggtitle(name)+scale_size(trans = "sqrt",range=c(.5,2.5))+
-    theme_classic()+ylab("Frequency")+xlab("Genome Position")+scale_color_brewer(palette = "Set1")
+    theme_classic()+ylab("Frequency")+xlab("Genome Position")+scale_color_brewer(palette = "Set1")+facet_grid(ORF~.)
   
   ggsave(filename = paste(inputDir,name,"_ManhattanPlot.pdf"),
          device = 'pdf',PP)
@@ -47,5 +47,4 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   write.csv(file=paste(inputDir,"/",name,"_0.005CO.csv",sep=""),filter[order(filter$freq,decreasing = T),])
   
   print(name)
-  dev.off()
 }

@@ -16,7 +16,7 @@ Please fork this project to improve annotation in the python portion ("Q20Analys
 Current usage instructions:
 1. Open a terminal in the same directory as the scripts and run: 
 
-    > python Q20Analysis.py <directory -- all file name must end include "q20.txt"> <translation start> <translation end>
+    > python Q20Analysis.py <directory -- all file name must end include "q20.txt"> <translation start> <translation end> <next ORF start> <next ORF stop> and so on...
 
 2. Edit 'annotAnalysis.R' 'to show the same directory as the python argument above.
 
@@ -27,7 +27,7 @@ Current usage instructions:
 3b. In command line:
     > r 
 then:
-    source("AnnotAnalysis.R")
+    > source("AnnotAnalysis.R")
 
 
 

@@ -4,7 +4,7 @@
 #	Usage: python Q20Analysis.py <q20file> <translationStart> <translationStop>
 
 
-import csv, os, sys, numpy as np
+import csv, os, sys, argparse, numpy as np
 
 bases = ['T', 'C', 'A', 'G']
 codons = [a+b+c for a in bases for b in bases for c in bases]
@@ -133,7 +133,7 @@ def annotate(root,Q20file):
 	print ("Annotating:", Q20file)
 	with open(root+"/"+Q20file,'r') as IF:
 		q20 = [element for element in [line.strip().split("\t") for line in IF]]
-		print ("Length"+str(len(q20)))
+		print ("Length of input reference: "+str(len(q20)))
 	#define annotation columns and tables	
 	ntTable = []
 	codTable = []
@@ -142,7 +142,6 @@ def annotate(root,Q20file):
 
 	#begin nt annotation
 	posVector =   [row[0] for row in q20 for sub in ("A","C","G","T")]
-	resPosVector = [(int(row[0])-translationStart) for row in q20 for sub in ("A","C","G","T")]
 	wtNtVector  = [row[1] for row in q20 for sub in ("A","C","G","T")]
 	mutNtVector = [sub    for row in q20 for sub in ("A","C","G","T")]
 	coverage    = [ (int(row[2])+int(row[3])+int(row[4])+int(row[5])) for row in q20 for sub in ("A","C","G","T") ]	
@@ -157,55 +156,82 @@ def annotate(root,Q20file):
 	wtAnnot = []
 	muAnnot = []
 	mutClass = []
+	posStack=[]
+	wtStack=[]
+	resStack=[]
+	muStack=[]
+	covStack=[]
+	countStack=[]
+	freqStack=[]
+	orfN = []
+	orfcounter = -1
 
-	for pos in range(0,translationStart):				#5'UTR annotation
-		for m in range(4):
-			resPosVector[pos*4+m] = 0
-			synInfo = ["U","U","U","U","U"]		
-			SNS.append(synInfo[0])
-			wtC.append(synInfo[1])
-			muC.append(synInfo[2])
-			wtR.append(synInfo[3])
-			muR.append(synInfo[4])
-			wtAnnot.append([0 for P in range(18)])
-			muAnnot.append([0 for P in range(18)])
-			mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])				
+	for [start,stop] in intervals:
+		resPosVector = [(int(row[0])-start) for row in q20 for sub in ("A","C","G","T")]
+		orfcounter+=1
+		start=int(start)
+		stop=int(stop)
 
-	for pos in range(translationStart,translationStop,3):		# for codon 	### Coding Sequence
-		for p in range(3): 										# for codon nt position
-			for sub in ("A","C","G","T"):	
-				synInfo = isSyn(q20[pos:pos+3], p, sub)					# for each sub
+		posStack.extend(posVector)
+		wtStack.extend(wtNtVector)
+		muStack.extend(mutNtVector)
+		covStack.extend(coverage)
+		countStack.extend(countVector)
+		freqStack.extend(freqVector)
+
+		print ("Start:"+str(start)+"  Stop:"+str(stop+1)+"  ORF Length:"+str((stop+1-start)/3))
+		for pos in range(0,start-1):				#5'UTR annotation
+			for m in range(4):
+				resPosVector[pos*4+m] = 0
+				synInfo = ["U","U","U","U","U"]		
 				SNS.append(synInfo[0])
 				wtC.append(synInfo[1])
 				muC.append(synInfo[2])
 				wtR.append(synInfo[3])
 				muR.append(synInfo[4])
-				wtAnnot.append([resAnnotMatrix[P][resDict[synInfo[3]]] for P in range(18)])
-				muAnnot.append([resAnnotMatrix[P][resDict[synInfo[4]]] for P in range(18)])
-				mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])
+				wtAnnot.append([0 for P in range(18)])
+				muAnnot.append([0 for P in range(18)])
+				orfN.append(str(orfcounter))
+				mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])				
 
-	for pos in range((translationStop+1),len(q20)):			#3'UTR annotation
-		for m in range(4) :
-			resPosVector[pos*4+m] = 0
-			synInfo = ["U","U","U","U","U"]	
-			SNS.append(synInfo[0])
-			wtC.append(synInfo[1])
-			muC.append(synInfo[2])
-			wtR.append(synInfo[3])
-			muR.append(synInfo[4])
-			wtAnnot.append([0 for P in range(18)])
-			muAnnot.append([0 for P in range(18)])
-			mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])	
+		for pos in range(start-1,stop,3):		# for codon 	### Coding Sequence
+			for p in range(3): 										# for codon nt position
+				for sub in ("A","C","G","T"):	
+					synInfo = isSyn(q20[pos:pos+3], p, sub)					# for each sub
+					SNS.append(synInfo[0])
+					wtC.append(synInfo[1])
+					muC.append(synInfo[2])
+					wtR.append(synInfo[3])
+					muR.append(synInfo[4])
+					orfN.append(str(orfcounter))
+					wtAnnot.append([resAnnotMatrix[P][resDict[synInfo[3]]] for P in range(18)])
+					muAnnot.append([resAnnotMatrix[P][resDict[synInfo[4]]] for P in range(18)])
+					mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])
 
-	wtVectorStr = ["\t".join([str(i) for i in row]) for row in wtAnnot]
-	muVectorStr = ["\t".join([str(i) for i in row]) for row in muAnnot]
-	q20annot = zip(posVector, resPosVector, wtNtVector, mutNtVector, countVector, coverage, freqVector, SNS, mutClass, wtC, muC, wtR, muR, wtVectorStr, muVectorStr)
+		for pos in range((stop),len(q20)):			#3'UTR annotation
+			for m in range(4) :
+				resPosVector[pos*4+m] = 0
+				synInfo = ["U","U","U","U","U"]	
+				SNS.append(synInfo[0])
+				wtC.append(synInfo[1])
+				muC.append(synInfo[2])
+				wtR.append(synInfo[3])
+				muR.append(synInfo[4])
+				orfN.append(str(orfcounter))
+				wtAnnot.append([0 for P in range(18)])
+				muAnnot.append([0 for P in range(18)])
+				mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])	
+
+		resStack.extend(resPosVector)
+		wtVectorStr = ["\t".join([str(i) for i in row]) for row in wtAnnot]
+		muVectorStr = ["\t".join([str(i) for i in row]) for row in muAnnot]
+	q20annot = zip(posStack, resStack, wtStack, muStack, orfN,countStack, covStack, freqStack, SNS, mutClass, wtC, muC, wtR, muR, wtVectorStr, muVectorStr)
 	return q20annot
 
 def outputFormat(root,file,annotQ20):
 	filename = root+"/"+file.split(".txt")[0]+"_annot.txt"
 	with open(filename,'w') as OF:
-		OF.write('ntpos\tresPos\twtNT\tmutNT\tcount\tcoverage\tfreq\tsynNonsyn\tmutClass\twtCodon\tmuCodon\twtRes\tmuRes\tacidic_wt\tacyclic_wt\taliphatic_wt\taromatic_wt\tbasic_wt\tburied_wt\tcharged_wt\tcyclic_wt\thydrophobic_wt\tlarge_wt\tmedium_wt\tnegative_wt\tneutral_wt\tpolar_wt\tpositive_wt\tsmall_wt\tsurface_wt\tstop_wt\tacidic_mu\tacyclic_mu\taliphatic_mu\taromatic_mu\tbasic_mu\tburied_mu\tcharged_mu\tcyclic_mu\thydrophobic_mu\tlarge_mu\tmedium_mu\tnegative_mu\tneutral_mu\tpolar_mu\tpositive_mu\tsmall_mu\tsurface_mu\tstop_mu\n')
+		OF.write('ntpos\tresPos\twtNT\tmutNT\tORF\tcount\tcoverage\tfreq\tsynNonsyn\tmutClass\twtCodon\tmuCodon\twtRes\tmuRes\tacidic_wt\tacyclic_wt\taliphatic_wt\taromatic_wt\tbasic_wt\tburied_wt\tcharged_wt\tcyclic_wt\thydrophobic_wt\tlarge_wt\tmedium_wt\tnegative_wt\tneutral_wt\tpolar_wt\tpositive_wt\tsmall_wt\tsurface_wt\tstop_wt\tacidic_mu\tacyclic_mu\taliphatic_mu\taromatic_mu\tbasic_mu\tburied_mu\tcharged_mu\tcyclic_mu\thydrophobic_mu\tlarge_mu\tmedium_mu\tnegative_mu\tneutral_mu\tpolar_mu\tpositive_mu\tsmall_mu\tsurface_mu\tstop_mu\n')
 		for row in annotQ20:
 			count = 0
 			for element in row:
@@ -259,9 +285,12 @@ def combineQ20s(inputDir):
 
 inputDir = sys.argv[1]
 
-translationStart=int(sys.argv[2])-1 #97 for DENV
+translationbreaks=list(sys.argv[2:]) #97 for DENV #10272 for DENVprint(translationbreaks)
+intervals=[[int(breaks) for breaks in translationbreaks[i:i+2]] for i in range(0,len(translationbreaks),2)]
 
-translationStop=int(sys.argv[3])-1 #10272 for DENV
+print("ORF Coordinates:")
+print (intervals)
+print("\n")
 
 for root,dirs,files in os.walk(inputDir):
 	for file in files:
