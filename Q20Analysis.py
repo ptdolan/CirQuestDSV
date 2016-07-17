@@ -1,8 +1,13 @@
-#Q20Analysis.py
+#	#	#	#	#	#
+#
+#	Q20Analysis.py
+#	
 #	Purpose: convert all Q20 files (all files ending in "Q20.txt") in an entire directory tree to a codon annotated version. 
 #	Also annotates amino acids with 18 residue properties.
 #	Usage: python Q20Analysis.py <q20file> <translationStart> <translationStop>
-
+#	Author: Patrick Dolan
+#
+#	#	#	#	#	#
 
 import csv, os, sys, argparse, numpy as np
 
@@ -208,7 +213,7 @@ def annotate(root,Q20file):
 					muAnnot.append([resAnnotMatrix[P][resDict[synInfo[4]]] for P in range(18)])
 					mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])
 
-		for pos in range((stop),len(q20)):			#3'UTR annotation
+		for pos in range(stop,len(q20)):			#3'UTR annotation
 			for m in range(4) :
 				resPosVector[pos*4+m] = 0
 				synInfo = ["U","U","U","U","U"]	
@@ -294,6 +299,7 @@ print("\n")
 
 for root,dirs,files in os.walk(inputDir):
 	for file in files:
+		print(file)
 		if "Q20.txt"==file[-7:]:				#check if it is a Q20file
 			annotQ20=annotate(root,file)
 			print(root+file)

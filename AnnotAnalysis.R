@@ -35,9 +35,8 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   
   #pdf(paste(inputDir,name,"_ManhattanPlot.pdf"),width=7,height=5)
   Qf<-ggplot(filter)
-  
   PP<-Qf+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=0.4)+
-    ylim(1e-6,1)+geom_text(cex=2,position = position_nudge(y=.01),data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=paste(wtRes,resPos,muRes)))+
+    ylim(1e-6,1)+geom_text(cex=2,position = position_nudge(y=.01),data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=ifelse(wtRes!="U",paste(wtRes,resPos,muRes),paste(wtNT,ntpos,mutNT))))+
     ggtitle(name)+scale_size(trans = "sqrt",range=c(.5,2.5))+
     theme_classic()+ylab("Frequency")+xlab("Genome Position")+
     scale_color_brewer(palette = "Set1")+facet_grid(ORF~.)
