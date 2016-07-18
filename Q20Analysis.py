@@ -87,7 +87,8 @@ resAnnotMatrix=[##Binary Vector -- could be mproved to be continuous data, see K
 [0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0],# surface
 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]]# stop
 
-pechmann=[["S","NS","C","C","NS","C","NS","NS","NS","NS","NS","NS","NC","NS","NS","C","C","NC","NS","NS","X","U"],
+pechmann=[
+["S","NS","C","C","NS","C","NS","NS","NS","NS","NS","NS","NC","NS","NS","C","C","NC","NS","NS","X","U"],
 ["NS","S","NS","NS","NC","C","NS","NS","NS","NS","NS","NS","NS","NS","C","C","NS","NS","C","C","X","U"],
 ["C","NS","S","C","NS","C","C","NS","NS","NS","NS","C","NS","NS","NS","NS","NS","C","NS","C","X","U"],
 ["C","NS","C","S","NS","C","NS","NS","C","NS","NS","NS","NS","C","NS","NS","NS","C","NS","NS","X","U"],
@@ -123,6 +124,7 @@ def isSyn(q20rows, p, subNT):
 	mut[p] = subNT
 	mutCodon = "".join(mut)
 	mutRes = codon_table["".join(mutCodon)]
+
 	if wtCodon == mutCodon:
 		SNS = "WT"
 	else:
@@ -172,11 +174,9 @@ def annotate(root,Q20file):
 	orfcounter = -1
 
 	for [start,stop] in intervals:
-		resPosVector = [(int(row[0])-start) for row in q20 for sub in ("A","C","G","T")]
+		resPosVector = [int(((int(row[0])-int(start))-((int(row[0])-int(start))%(3)))/3+1 )for row in q20 for sub in ("A","C","G","T")]
 		orfcounter+=1
-		start=int(start)
-		stop=int(stop)
-
+		
 		posStack.extend(posVector)
 		wtStack.extend(wtNtVector)
 		muStack.extend(mutNtVector)
@@ -184,8 +184,8 @@ def annotate(root,Q20file):
 		countStack.extend(countVector)
 		freqStack.extend(freqVector)
 
-		print ("Start:"+str(start)+"  Stop:"+str(stop+1)+"  ORF Length:"+str((stop+1-start)/3))
-		for pos in range(0,start-1):				#5'UTR annotation
+		print ("Start:"+str(start)+"  Stop:"+str(stop)+"  ORF Length:"+str((stop+1-start)/3))
+		for pos in range(start-1):				#5'UTR annotation
 			for m in range(4):
 				resPosVector[pos*4+m] = 0
 				synInfo = ["U","U","U","U","U"]		
@@ -225,12 +225,14 @@ def annotate(root,Q20file):
 				orfN.append(str(orfcounter))
 				wtAnnot.append([0 for P in range(18)])
 				muAnnot.append([0 for P in range(18)])
-				mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])	
+				mutClass.append(pechmann[resDict[synInfo[3]]][resDict[synInfo[4]]])
 
 		resStack.extend(resPosVector)
 		wtVectorStr = ["\t".join([str(i) for i in row]) for row in wtAnnot]
 		muVectorStr = ["\t".join([str(i) for i in row]) for row in muAnnot]
+		
 	q20annot = zip(posStack, resStack, wtStack, muStack, orfN,countStack, covStack, freqStack, SNS, mutClass, wtC, muC, wtR, muR, wtVectorStr, muVectorStr)
+
 	return q20annot
 
 def outputFormat(root,file,annotQ20):
@@ -285,7 +287,6 @@ def combineQ20s(inputDir):
 				OF.write("\n")
 			print ("wrote "+inputDir+"/master_"+filename)
 
-
 ############ MAIN ###############
 
 inputDir = sys.argv[1]
@@ -295,11 +296,9 @@ intervals=[[int(breaks) for breaks in translationbreaks[i:i+2]] for i in range(0
 
 print("ORF Coordinates:")
 print (intervals)
-print("\n")
 
 for root,dirs,files in os.walk(inputDir):
 	for file in files:
-		print(file)
 		if "Q20.txt"==file[-7:]:				#check if it is a Q20file
 			annotQ20=annotate(root,file)
 			print(root+file)
