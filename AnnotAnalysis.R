@@ -40,7 +40,7 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   
   Qf<-ggplot(filter)
   PP<-Qf+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=0.4)+
-    geom_text(cex=2,data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=ifelse(wtRes!="U",paste(wtRes,resPos,muRes),paste(wtNT,ntpos,mutNT))))+
+    geom_text(cex=2,data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=ifelse(wtRes!="U",as.character(resID),as.character(ntID))))+
     ggtitle(name)+scale_size(trans = "sqrt",range=c(.5,2.5))+
     theme_classic()+ylab("Frequency")+xlab("Genome Position")+
     scale_color_brewer(palette = "Set1")+facet_grid(ORF~.)
