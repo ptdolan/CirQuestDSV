@@ -19,17 +19,19 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   q20$name<-as.factor(name)
   q20$ntID<-as.factor(with(q20,paste( wtNT,ntpos,mutNT,sep="" )))
   q20$resID<-as.factor(with(q20,make.unique(paste( wtRes,resPos,muRes,sep="" ))))
-  str(q20)
   #NT entropy
   q20$HsN<-rep(unlist(by(q20$count,q20$ntpos,function(X){sum(X/sum(X)*log2(X/sum(X)))}[[1]])),each=4)
   q20$HsN[is.na(q20$HsN)]<-0.0
   
   #filt
-  if(is.na(passage)){print("No passage")}
+  if(is.na(passage)){
+    print("No passage")
+    filter = q20[(q20$wtNT!=q20$mutNT)&q20$count>3,] #filter out WT and low counts(by binom)
+    }
   else{print("not NaN")
-  q20$passage<-as.factor(passage)
-  filter = q20[(q20$wtNT!=q20$mutNT)&q20$count>3,] #filter out WT and low counts(by binom)
-  allq20<-rbind(allq20,filter)}
+    q20$passage<-as.factor(passage)
+    filter = q20[(q20$wtNT!=q20$mutNT)&q20$count>3,] #filter out WT and low counts(by binom)
+    allq20<-rbind(allq20,filter)}
 
   
   #pdf(paste(inputDir,name,"_ManhattanPlot.pdf"),width=7,height=5)
@@ -61,3 +63,5 @@ TT<-Qa+geom_path( aes(passage,freq, group=ntID,colour=synNonsyn),alpha=0.4)+
 ggsave(filename = paste(inputDir,"dir_sqrt_TrajPlot.pdf"),
        device = 'pdf',TT+scale_y_sqrt(breaks=c(0,.001,.01,.05,.1,.2,.4,.6,.8,1))+facet_grid(ORF~.))
 
+ggsave(filename = paste(inputDir,"dir_log_TrajPlot.pdf"),
+       device = 'pdf',TT+scale_y_log10(breaks=c(.000001,.00001,.0001,.001,.01,.1,1))+facet_grid(ORF~.))
