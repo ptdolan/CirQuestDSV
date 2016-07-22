@@ -20,9 +20,10 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   q20$ntID<-as.factor(with(q20,paste( wtNT,ntpos,mutNT,sep="" )))
   q20$resID<-as.factor(with(q20,make.unique(paste( wtRes,resPos,muRes,sep="" ))))
   #NT entropy
-  q20$HsN<-rep(unlist(by(q20$count,q20$ntpos,function(X){sum(X/sum(X)*log2(X/sum(X)))}[[1]])),each=4)
-  q20$HsN[is.na(q20$HsN)]<-0.0
+  q20$HsN<-rep(unlist(by(q20$count,q20$ntpos,function(X){-sum(na.rm = T, (X/sum(X)) * log((X/sum(X)),base = 4))}[[1]]) ),each=4)
   
+  q20$HsN[is.na(q20$HsN)]<-0.0
+  #hist(q20$HsN,breaks = 1000)
   #filt
   if(is.na(passage)){
     print("No passage")
@@ -37,6 +38,9 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   #pdf(paste(inputDir,name,"_ManhattanPlot.pdf"),width=7,height=5)
   
 ##### GGPLOT2 ######
+  Qh<-ggplot(q20)+geom_line(aes(ntpos,HsN),position = 'dodge',stat="identity")+ylab("Entropy")+xlab("Genome Position")
+  ggsave(filename = paste(inputDir,name,"_Entropy.pdf"),
+         device = 'pdf',Qh)
   
   Qf<-ggplot(filter)
   PP<-Qf+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=0.4)+
@@ -65,3 +69,5 @@ ggsave(filename = paste(inputDir,"dir_sqrt_TrajPlot.pdf"),
 
 ggsave(filename = paste(inputDir,"dir_log_TrajPlot.pdf"),
        device = 'pdf',TT+scale_y_log10(breaks=c(.000001,.00001,.0001,.001,.01,.1,1))+facet_grid(ORF~.))
+
+
