@@ -7,11 +7,15 @@ ptdolan@stanford.edu
 This is a repository for code related to the analysis of Circular Resequencing data. Code may be written in python  and/or R.
 All code in this repository is intended for use downstream of Q-threshold count table generation by the CirSeq software package.
 
-7-13-16
+7-13-16, 7-21-16:
 
-This package has been updated with a base program for analyzing the output of CirSeq ('"Q" files') and plotting general information about them. It also generate a list of high frequency mutations and agglomerates q files into useful R data structures for further analysis. Updated to python 3.0.
+This package has been updated with a base program for analyzing the output of CirSeq ('"Q" files') and plotting general information about them. It also generate a list of high frequency mutations and agglomerates q files into useful R data structures for further analysis. Updated to python 3.0. 
 
 Please fork this project to improve annotation in the python portion ("Q20Analysis.py") or to develop analyses based on this data structure in R.
+
+File names:
+ 1. All file names must end in "Q20.txt" !!!
+ 2. For grouped passages: Files in directory must be labeled "1-Q20.txt","2-Q20.txt","3-Q20.txt", those that do not match criteria are excluded from trajectory plots.
 
 Current usage instructions:
 1. Open a terminal in the same directory as the scripts and run: 
