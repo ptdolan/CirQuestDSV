@@ -25,49 +25,62 @@ for (q20file in list.files(inputDir,pattern = 'annot.txt',full.names = T)){ #Rea
   q20$HsN[is.na(q20$HsN)]<-0.0
   #hist(q20$HsN,breaks = 1000)
   #filt
+  
   if(is.na(passage)){
-    print("No passage")
+    print("No passage info...")
     filter = q20[(q20$wtNT!=q20$mutNT)&q20$count>3,] #filter out WT and low counts(by binom)
     }
-  else{print("not NaN")
+  else{print("Passage info detected...")
     q20$passage<-as.factor(passage)
     filter = q20[(q20$wtNT!=q20$mutNT)&q20$count>3,] #filter out WT and low counts(by binom)
-    allq20<-rbind(allq20,filter)}
+    allq20<-rbind(allq20,q20[(q20$wtNT!=q20$mutNT),])}
 
-  
   #pdf(paste(inputDir,name,"_ManhattanPlot.pdf"),width=7,height=5)
   
 ##### GGPLOT2 ######
   Qh<-ggplot(q20)+geom_line(aes(ntpos,HsN),position = 'dodge',stat="identity")+ylab("Entropy")+xlab("Genome Position")
-  ggsave(filename = paste(inputDir,name,"_Entropy.pdf"),
+  ggsave(filename = paste(inputDir,name,"_Entropy.pdf",sep=""),
          device = 'pdf',Qh)
   
   Qf<-ggplot(filter)
-  PP<-Qf+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=0.4)+
+  Q<-ggplot(q20[q20$wtNT!=q20$mutNT,])
+  PU<-Q+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=0.4)+
     geom_text(cex=2,data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=ifelse(wtRes!="U",as.character(resID),as.character(ntID))))+
     ggtitle(name)+scale_size(trans = "sqrt",range=c(.5,2.5))+
     theme_classic()+ylab("Frequency")+xlab("Genome Position")+
     scale_color_brewer(palette = "Set1")+facet_grid(ORF~.)
-  
-  ggsave(filename = paste(inputDir,name,"_log10_ManhattanPlot.pdf"),
-         device = 'pdf',PP+scale_y_log10(limits=c(10E-7,1)))##Edit here ("limits=c(10E-7,1)) for different fixed depth or delete for autoscaling
+  PF<-Qf+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn),alpha=0.4)+
+    geom_text(cex=2,data=filter[filter$freq>FILTER,],aes(ntpos,freq,label=ifelse(wtRes!="U",as.character(resID),as.character(ntID))))+
+    ggtitle(name)+scale_size(trans = "sqrt",range=c(.5,2.5))+
+    theme_classic()+ylab("Frequency")+xlab("Genome Position")+
+    scale_color_brewer(palette = "Set1")+facet_grid(ORF~.)
+  ggsave(filename = paste(inputDir,name,"_log10_ManhattanPlot.pdf",sep=""),
+         device = 'pdf',PU+scale_y_log10(limits=c(10E-7,1)))##Edit here ("limits=c(10E-7,1)) for different fixed depth or delete for autoscaling
 
-  ggsave(filename = paste(inputDir,name,"_sqrt_ManhattanPlot.pdf"),
-         device = 'pdf',PP+scale_y_sqrt(limits=c(0,1),breaks=c(0,.001,.01,.05,.1,.2,.4,.6,.8,1)))
+  ggsave(filename = paste(inputDir,name,"_sqrt_ManhattanPlot.pdf",sep=""),
+         device = 'pdf',PU+scale_y_sqrt(limits=c(0,1),breaks=c(0,.001,.01,.05,.1,.2,.4,.6,.8,1)))
+  
+  ggsave(filename = paste(inputDir,name,"Filtered_log10_ManhattanPlot.pdf",sep=""),
+         device = 'pdf',PF+scale_y_log10(limits=c(10E-7,1)))##Edit here ("limits=c(10E-7,1)) for different fixed depth or delete for autoscaling
+  
+  ggsave(filename = paste(inputDir,name,"Filtered_sqrt_ManhattanPlot.pdf",sep=""),
+         device = 'pdf',PF+scale_y_sqrt(limits=c(0,1),breaks=c(0,.001,.01,.05,.1,.2,.4,.6,.8,1)))
   
   ##### Write output table##########
   write.csv(file=paste(inputDir,"/",name,"_",FILTER,"CO.csv",sep=""),filter[order(filter$freq,decreasing = T),])
 }
 Qa<-ggplot(allq20)
+write.csv(file=paste(inputDir,"/TrajectoryFreqTable.csv",sep=""),output)
+output<-dcast(data = allq20[allq20$ORF==0,],formula = wtNT+ntpos+mutNT~passage,value.var = "freq")
+
 TT<-Qa+geom_path( aes(passage,freq, group=ntID,colour=synNonsyn),alpha=0.4)+
-  ggtitle(name)+
   theme_classic()+ylab("Frequency")+xlab("Passage")+
   scale_color_brewer(palette = "Set1")
 
-ggsave(filename = paste(inputDir,"dir_sqrt_TrajPlot.pdf"),
+ggsave(filename = paste(inputDir,"dir_sqrt_TrajPlot.pdf",sep=""),
        device = 'pdf',TT+scale_y_sqrt(breaks=c(0,.001,.01,.05,.1,.2,.4,.6,.8,1))+facet_grid(ORF~.))
 
-ggsave(filename = paste(inputDir,"dir_log_TrajPlot.pdf"),
+ggsave(filename = paste(inputDir,"dir_log_TrajPlot.pdf",sep=""),
        device = 'pdf',TT+scale_y_log10(breaks=c(.000001,.00001,.0001,.001,.01,.1,1))+facet_grid(ORF~.))
 
 
