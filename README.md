@@ -1,17 +1,22 @@
 CirQuestDSV
-(C) Copyright 2014-2016. All Rights Reserved.
+
 ptdolan@stanford.edu
 ===========
-12-13-14 
+Description:
 
 This is a repository for code related to the analysis of Circular Resequencing data. Code may be written in python  and/or R.
 All code in this repository is intended for use downstream of Q-threshold count table generation by the CirSeq software package.
 
-7-13-16, 7-21-16:
-
 This package has been updated with a base program for analyzing the output of CirSeq ('"Q" files') and plotting general information about them. It also generate a list of high frequency mutations and agglomerates q files into useful R data structures for further analysis. Updated to python 3.0. 
 
 Please fork this project to improve annotation in the python portion ("Q20Analysis.py") or to develop analyses based on this data structure in R.
+
+
+Requirements:
+Python (3.X compliant)
+
+
+/!5. Usage:
 
 File names:
  1. All file names must end in "Q20.txt" !!!
@@ -34,5 +39,12 @@ then:
     > source("AnnotAnalysis.R")
 
 
+4. MIT License
 
+Copyright (c) [2016] [Patrick T. Dolan]
 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
