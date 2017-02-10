@@ -43,7 +43,7 @@ if(length(fileList>0)){
       header<-headerInfo
     }else{if(headLen>0){
       print(paste("Header:", headerInfo, "Passage:", passage))
-      header<-paste(c(headerInfo,passage),collapse = "-P")
+      header<-headerInfo<-paste(c(headerInfo,passage),collapse = "-P")
     }else{
       header="Sample"
       print(paste("No Header Info:",headerInfo,"Passage:", passage))
@@ -74,11 +74,13 @@ if(length(fileList>0)){
     PU<-Q+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+
       geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn,alpha=count<3))+
       scale_alpha_discrete(range=c(.5,.1))+
+      scale_size(range = c(0.2,3))+
       geom_text(cex=2,
                 data=q20[q20$wtNT!=q20$mutNT&q20$freq>FILTER,],
                 aes(ntpos,freq,label=ifelse(wtRes!="U",as.character(resID),as.character(ntID))))+
       theme_classic()+ylab("Frequency")+xlab("Genome Position")+
       scale_color_brewer(palette = "Set1")+ggtitle(headerInfo)+facet_grid(ORF~.)
+    
     PU+scale_y_log10(limits=c(10E-7,1))
 
     ggsave(width=6,height=4, filename = paste(rootDir,figureDir,headerInfo,"_log10_ManhattanPlot.pdf",sep=""),
@@ -100,12 +102,7 @@ if(length(fileList>0)){
   #                                 matrix(apply(output[ rowSums(output[,7:ncol(output)])>2, 1:6 ],MARGIN = 1,paste,collapse=".")))
   if(ncol(output)>7){
     masked<-output[ which(rowSums(output[,7:ncol(output)])<2),]
-  
-  
-  
     #Princomp
-    
-    
     PCallq20<-prcomp(masked[,7:ncol(masked)])
   
     Dist<-dist(t(masked[,7:ncol(masked)]),method = "man")
