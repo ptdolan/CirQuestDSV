@@ -19,7 +19,8 @@ Python (3.X compliant)
 /!5. Usage:
 
 File names:
- 1. All file names must end in "Q20.txt" !!!
+ 1. All file names must end in "Q20.txt" or "Q20threshold.txt"!
+ 		This makes sure that overwriting does not occur when output files and input files are in the same directory. 
  2. For grouped passages: Files in directory must be labeled "1-Q20.txt","2-Q20.txt","3-Q20.txt", those that do not match criteria are excluded from trajectory plots.
 
 Current usage instructions:

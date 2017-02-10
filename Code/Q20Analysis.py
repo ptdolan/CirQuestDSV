@@ -11,16 +11,16 @@
 
 import csv, os, sys, argparse, numpy as np
 header=True
-bases = ['T', 'C', 'A', 'G']
+bases = ['t', 'c', 'a', 'g']
 codons = [a+b+c for a in bases for b in bases for c in bases]
 amino_acids = 'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG'
 codon_table = dict(zip(codons, amino_acids))
 
 ntDict={
-'A':0,
-'C':1,
-'G':2,
-'T':3}
+'a':0,
+'c':1,
+'g':2,
+'t':3}
 
 resDict={
 'Ala':0,  'A':0,
@@ -150,11 +150,11 @@ def annotate(root,Q20file):
 	res = []
 
 	#begin nt annotation
-	posVector =   [row[0] for row in q20 for sub in ("A","C","G","T")]
-	wtNtVector  = [row[1] for row in q20 for sub in ("A","C","G","T")]
-	mutNtVector = [sub    for row in q20 for sub in ("A","C","G","T")]
-	coverage    = [ int(row[2])+int(row[3])+int(row[4])+int(row[5]) for row in q20 for sub in ("A","C","G","T") ]	
-	countVector = [ float(row[ntDict[sub]+2]) for row in q20 for sub in ("A","C","G","T") ]
+	posVector =   [row[0] for row in q20 for sub in ("a","c","g","t")]
+	wtNtVector  = [row[1] for row in q20 for sub in ("a","c","g","t")]
+	mutNtVector = [sub    for row in q20 for sub in ("a","c","g","t")]
+	coverage    = [ int(row[2])+int(row[3])+int(row[4])+int(row[5]) for row in q20 for sub in ("a","c","g","t") ]	
+	countVector = [ float(row[ntDict[sub]+2]) for row in q20 for sub in ("a","c","g","t") ]
 	#print(countVector)
 	#print(coverage)
 	freqVector =  np.divide(countVector,coverage)
@@ -178,7 +178,7 @@ def annotate(root,Q20file):
 	orfcounter = -1
 
 	for [start,stop] in intervals:
-		resPosVector = [ int(((int(row[0])-int(start))-((int(row[0])-int(start))%(3)))/3+1) for row in q20 for sub in ("A","C","G","T") ]
+		resPosVector = [ int(((int(row[0])-int(start))-((int(row[0])-int(start))%(3)))/3+1) for row in q20 for sub in ("a","c","g","t") ]
 		orfcounter+=1
 		
 		posStack.extend(posVector)
@@ -205,7 +205,7 @@ def annotate(root,Q20file):
 
 		for pos in range(start-1,stop,3):		# for codon 	 	### Coding Sequence
 			for p in range(3): 										# for codon nt position
-				for sub in ("A","C","G","T"):	
+				for sub in ("a","c","g","t"):	
 					synInfo = isSyn(q20[pos:pos+3], p, sub)			# for each sub
 					SNS.append(synInfo[0])
 					wtC.append(synInfo[1])
@@ -241,6 +241,7 @@ def annotate(root,Q20file):
 
 def outputFormat(root,file,annotQ20):
 	filename = root+"/"+file.split(".txt")[0]+"_annot.txt"
+	print("Writing "+filename+"...")
 	with open(filename,'w') as OF:
 		OF.write('ntpos\tresPos\twtNT\tmutNT\tORF\tcount\tcoverage\tfreq\tsynNonsyn\tmutClass\twtCodon\tmuCodon\twtRes\tmuRes\tacidic_wt\tacyclic_wt\taliphatic_wt\taromatic_wt\tbasic_wt\tburied_wt\tcharged_wt\tcyclic_wt\thydrophobic_wt\tlarge_wt\tmedium_wt\tnegative_wt\tneutral_wt\tpolar_wt\tpositive_wt\tsmall_wt\tsurface_wt\tstop_wt\tacidic_mu\tacyclic_mu\taliphatic_mu\taromatic_mu\tbasic_mu\tburied_mu\tcharged_mu\tcyclic_mu\thydrophobic_mu\tlarge_mu\tmedium_mu\tnegative_mu\tneutral_mu\tpolar_mu\tpositive_mu\tsmall_mu\tsurface_mu\tstop_mu\n')
 		for row in annotQ20:
@@ -298,19 +299,18 @@ inputDir = sys.argv[1]
 
 translationbreaks=list(sys.argv[2:]) #97 for DENV #10272 for DENV
 if(translationbreaks==[]):
-	error("No ORFs. Please add ORFs: 'python Q20Analysis.py <q20Dir>  <translationStart> <translationStop> '")
+	print("No ORFs. Please add ORFs: 'python Q20Analysis.py <q20Dir>  <translationStart> <translationStop> '")
 
-intervals=[[int(breaks) for breaks in translationbreaks[i:i+2]] for i in range(0,len(translationbreaks),2)]
-
-print("ORF Coordinates:")
-print (intervals)
-
-for root,dirs,files in os.walk(inputDir):
-	for file in files:
-			if "Q20threshold.txt"==file[-16:]:				#check if it is a Q20file
-				print(file)
+else:
+	intervals=[[int(breaks) for breaks in translationbreaks[i:i+2]] for i in range(0,len(translationbreaks),2)]
+	print("ORF Coordinates:")
+	print (intervals)
+	for root,dirs,files in os.walk(inputDir):
+		for file in files:
+			if file.endswith(("Q20threshold.txt","Q20.txt")):
 				annotQ20=annotate(root,file)
-				print(root+file)
+				print("...done.")
 				OF = outputFormat(root,file,annotQ20)
+				print("...done.")
 
 #combineQ20s(inputDir) #uncomment if combining q20counts !!!!! unstable !!!!
