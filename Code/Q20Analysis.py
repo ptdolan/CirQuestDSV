@@ -302,7 +302,7 @@ if(translationbreaks==[]):
 	print("No ORFs. Please add ORFs: 'python Q20Analysis.py <q20Dir>  <translationStart> <translationStop> '")
 
 else:
-	intervals=[[int(breaks) for breaks in translationbreaks[i:i+2]] for i in range(0,len(translationbreaks),2)]
+	intervals=[[int(breaks)-1 for breaks in translationbreaks[i:i+2]] for i in range(0,len(translationbreaks),2)]
 	print("ORF Coordinates:")
 	print (intervals)
 	for root,dirs,files in os.walk(inputDir):
