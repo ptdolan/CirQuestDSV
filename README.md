@@ -4,7 +4,7 @@ ptdolan@stanford.edu
 ===========
 Description:
 
-This is a repository for code related to the analysis of Circular Resequencing data. Code may be written in python  and/or R.
+This is a repository for code related to the analysis of Circular Resequencing data. Code may be written in python and/or R.
 All code in this repository is intended for use downstream of Q-threshold count table generation by the CirSeq software package.
 
 This package has been updated with a base program for analyzing the output of CirSeq ('"Q" files') and plotting general information about them. It also generate a list of high frequency mutations and agglomerates q files into useful R data structures for further analysis. Updated to python 3.0. 
@@ -14,35 +14,43 @@ Please fork this project to improve annotation in the python portion ("Q20Analys
 
 Requirements:
 Python (3.X compliant)
+R
 
-
-/!5. Usage:
+Usage:
 
 File names:
- 1. All file names must end in "Q20.txt" or "Q20threshold.txt"!
+ 1. All input file names must end in "Q20.txt" or "Q20threshold.txt"!
  		This makes sure that overwriting does not occur when output files and input files are in the same directory. 
- 2. For grouped passages: Files in directory must be labeled "1-Q20.txt","2-Q20.txt","3-Q20.txt", those that do not match criteria are excluded from trajectory plots.
+
+ 2. Directory should be named something useful, for useful annotations later. Plots and data tables will use these for annotation.
+
+ 		e.g.: "~/pathto/Zika_MouseA_treated/1-Q20.txt"
+
+ 3. For grouped passages:
+ 	Files in directory must be labeled "1-Q20.txt","2-Q20.txt","3-Q20.txt", those that do not match criteria are excluded from trajectory plots.
+
 
 Current usage instructions:
+
 1. Open a terminal in the same directory as the scripts and run: 
 
-    > python Q20Analysis.py <directory -- all file names must end in "Q20.txt" > <translation start> <translation end> <next ORF start> <next ORF stop> and so on...
+    > python Q20Analysis.py <directory with q20 files> <translation start> <translation end> <next ORF start> <next ORF stop> and so on...
 
-2. Edit 'annotAnalysis.R' to show the same directory as the python argument above.
+    This generates an annotated q20 file. You can stop here or you can use this enhanced q20 to generate plots in with the following command. 
 
-3. Run script in R. 
+2. with R installed: 
+	in command line: "Rscript ./path/to/AnnotAnalysis.R ./path/to/N-q20.txt"
 
-3a. Open and run in RStudio or:
+	or: 
 
-3b. In command line:
-    > r 
-then:
-    > source("AnnotAnalysis.R")
+	in R: source("./path/to/AnnotAnalysis.R","./path/to/N-q20.txt")
+
+_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 
-4. MIT License
+MIT License
 
-Copyright (c) [2016] [Patrick T. Dolan]
+Copyright (c) [2016-2017] [Patrick T. Dolan]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
