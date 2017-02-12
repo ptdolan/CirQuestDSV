@@ -22,13 +22,13 @@ File names:
  1. All input file names must end in "Q20.txt" or "Q20threshold.txt"!
  		This makes sure that overwriting does not occur when output files and input files are in the same directory. 
 
- 2. Directory should be named something useful, for useful annotations later. Plots and data tables will use these for annotation.
+ 2. Each input file requires specific naming for grouping and plotting features. these will also be parsed for data table annotation.
 
- 		e.g.: "~/pathto/Zika_MouseA_treated/1-Q20.txt"
+ 		e.g.: "~/pathto/myData/MouseA_plusTreatment_1-Q20.txt"
 
  3. For grouped passages:
- 	Files in directory must be labeled "1-Q20.txt","2-Q20.txt","3-Q20.txt", those that do not match criteria are excluded from trajectory plots.
-
+ 
+ 	Files in directory must be labeled "MYHEADERTEXT_1-Q20.txt","HEADERTEXT_2-Q20.txt","HEADERTEXT_3-Q20.txt", those that do not match criteria are excluded from trajectory plots. Including MYHEADERTEXT is optional but useful for labeling if no header needed, "1-Q20.txt","2-Q20.txt","3-Q20.txt" is sufficient for grouping. 
 
 Current usage instructions:
 
@@ -36,14 +36,16 @@ Current usage instructions:
 
     > python Q20Analysis.py <directory with q20 files> <translation start> <translation end> <next ORF start> <next ORF stop> and so on...
 
-    This generates an annotated q20 file. You can stop here or you can use this enhanced q20 to generate plots in with the following command. 
+    This generates an annotated q20 ("-q20annot.txt") file. You can stop here and use this annotated file for interpretation, or you can use this enhanced q20 to generate plots in with the following command. 
 
 2. with R installed: 
-	in command line: "Rscript ./path/to/AnnotAnalysis.R ./path/to/N-q20.txt"
+	in command line: 
+		> Rscript ./path/to/AnnotAnalysis.R ./path/to/N-q20.txt
 
 	or: 
-
-	in R: source("./path/to/AnnotAnalysis.R","./path/to/N-q20.txt")
+		> R
+	then, in R: 
+		> source("./path/to/AnnotAnalysis.R","./path/to/N-q20.txt")
 
 _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
