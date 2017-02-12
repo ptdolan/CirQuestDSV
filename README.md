@@ -40,12 +40,12 @@ Current usage instructions:
 
 2. with R installed: 
 	in command line: 
-		Rscript ./path/to/AnnotAnalysis.R ./path/to/N-q20.txt
+		Rscript ./path/to/AnnotAnalysis.R ./pathto/q20annots/
 
 	or: 
 		R
 	then, in R: 
-		source("./path/to/AnnotAnalysis.R","./path/to/N-q20.txt")
+		source("./path/to/AnnotAnalysis.R","./pathto/q20annots/)
 
 _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
