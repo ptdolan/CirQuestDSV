@@ -16,7 +16,7 @@ This package currently contains two main scripts:
 	- An agglomerated q20annot file in an .RData format. Useful for further analysis in R, without reloading the dataset. 
 
 - In *Entropy* directory: 
-	- Plots of the position entropy for each nucleotide in the genome
+	- Plots of the Shannon entropy (scaled 0-1) for each nucleotide position in the genome.
 	
 - In *CirQuestDSV_figures* directory: 
 	- Frequency plots of the frequency of individual alleles cross the genome. 
