@@ -3,7 +3,7 @@
 ===========
 <h2>Description:</h2>
 
-This is a repository for code related to the analysis of [Circular Resequencing data](http://andino.ucsf.edu/toolsandprotocols). Code written in python and R.
+This is a repository for code related to the analysis of [Circular Resequencing data](https://www.ncbi.nlm.nih.gov/pubmed/27440878). Code written in python and R.
 
 All code in this repository is intended for use downstream of Q-threshold count table generation by the [CirSeq software package](http://andino.ucsf.edu/toolsandprotocols).
 
