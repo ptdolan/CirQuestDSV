@@ -7,7 +7,21 @@ This is a repository for code related to the analysis of [Circular Resequencing 
 
 All code in this repository is intended for use downstream of Q-threshold count table generation by the [CirSeq software package](http://andino.ucsf.edu/toolsandprotocols).
 
-This package has been updated with a base program for analyzing the output of CirSeq ('"Q" files') and plotting general information about them. It also generate a list of high frequency mutations and agglomerates q files into useful R data structures for further analysis. Updated to python 3.0. 
+This package currently contains two main scripts: 
+**Q20Analysis.py**: an annotation program for analyzing the output of CirSeq ('"Q" files') and annotating coding regions, translating ORFs, and annotating biophysical characteristics of the substitutions.
+**AnnotAnalysis.R**: An R script for generating a collection of summary plots and data tables based on the naming scheme of the Input Directory. It generates the following:
+
+- In *CirQuestDSV_tables* directory:
+	- A table of high frequency mutations.
+	- An agglomerated q20annot file in an .RData format. Useful for further analysis in R, without reloading the dataset. 
+
+- In *Entropy* directory: 
+	- Plots of the position entropy for each nucleotide in the genome
+	
+- In *CirQuestDSV_figures* directory: 
+	- Frequency plots of the frequency of individual alleles cross the genome. 
+	- Trajectories for labeled passages (see below.)
+	- MDS and PCA dimension reduction of all samples. 
 
 **Please fork this project to improve annotation in the python portion ("Q20Analysis.py") or to develop analyses based on this data structure in R.**
 
