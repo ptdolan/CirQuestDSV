@@ -20,15 +20,13 @@ Usage:
 
 File names:
  1. All input file names must end in "Q20.txt" or "Q20threshold.txt"!
- 		This makes sure that overwriting does not occur when output files and input files are in the same directory. 
+ 	This makes sure that overwriting does not occur when output files and input files are in the same directory. 
 
  2. Each input file requires specific naming for grouping and plotting features. these will also be parsed for data table annotation.
-
- 		e.g.: "~/pathto/myData/MouseA_plusTreatment_1-Q20.txt"
+	e.g.: "~/pathto/myData/MouseA_plusTreatment_1-Q20.txt"
 
  3. For grouped passages:
- 
- 	Files in directory must be labeled "MYHEADERTEXT_1-Q20.txt","HEADERTEXT_2-Q20.txt","HEADERTEXT_3-Q20.txt", those that do not match criteria are excluded from trajectory plots. Including MYHEADERTEXT is optional but useful for labeling if no header needed, "1-Q20.txt","2-Q20.txt","3-Q20.txt" is sufficient for grouping. 
+ 	In order for files to be grouped correctly in the plotting and analysis steps, files in directory must be labeled "MYHEADERTEXT_1-Q20.txt","HEADERTEXT_2-Q20.txt","HEADERTEXT_3-Q20.txt", those that do not match criteria are excluded from trajectory plots. Including MYHEADERTEXT is optional but useful for labeling if no header needed, "1-Q20.txt","2-Q20.txt","3-Q20.txt" is sufficient for grouping. 
 
 Current usage instructions:
 
@@ -36,9 +34,11 @@ Current usage instructions:
 
     > python Q20Analysis.py <directory with q20 files> <translation start> <translation end> <next ORF start> <next ORF stop> and so on...
 
-    This generates an annotated q20 ("-q20annot.txt") file. You can stop here and use this annotated file for interpretation, or you can use this enhanced q20 to generate plots in with the following command. 
+    This generates an annotated q20 ("-q20annot.txt") file. You can stop here and use this annotated file for interpretation, or you can use this enhanced q20 to generate plots with the associated R script, "AnnotAnalysis.R". 
+    
+2. "AnnotAnalysis.R". This program reads a directory of annotated files and combines them to generate frequency plots, trajectory plots, it also performs dimension reduction analysis and outputs a number of useful output files. 
 
-2. with R installed: 
+with R installed: 
 	in command line: 
 		Rscript ./path/to/AnnotAnalysis.R ./pathto/q20annots/
 
