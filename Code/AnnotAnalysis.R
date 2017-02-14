@@ -112,11 +112,11 @@ if(length(fileList>0)){
     Dist<-dist(t(masked[,8:ncol(masked)]),method = "euclidian")
     
     distDF<-as.data.frame(cmdscale(Dist))
-    distDF$header<-strsplit2(rownames(distDF),split="\\.")[,1]
+    distDF$header<-strsplit2(rownames(distDF),split="_")[,1]
     distDF$passage<-strsplit2(rownames(distDF),split="_")[,2]
     mdsPlot<-ggplot(distDF)+geom_point(aes(V1,V2,color=header),alpha=0.5)+scale_color_brewer(palette="Paired")+geom_text(aes(V1,V2,label=passage))
     
-    PCDF<-data.frame(PCallq20$rotation,header=strsplit2(rownames(distDF),split = "\\.")[,1],passage=strsplit2(rownames(distDF),split="_")[,2])
+    PCDF<-data.frame(PCallq20$rotation,header=strsplit2(rownames(distDF),split = "_")[,1],passage=strsplit2(rownames(distDF),split="_")[,2])
     ggsave(ggplot(PCDF)+geom_point(aes(PC1,PC2,color=header))+geom_text(aes(PC1,PC2,label=passage),cex=2.5)+scale_color_brewer(palette="Paired"),filename = "PCPlot.pdf")
     ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"AllPop_PCA.pdf",sep=""),
            ggplot(PCDF)+geom_point(aes(PC1,PC2,color=header))+
