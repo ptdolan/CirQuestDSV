@@ -19,11 +19,12 @@ R
 Usage:
 
 File names:
- 1. All input file names must end in "Q20.txt" or "Q20threshold.txt"!
- 	This makes sure that overwriting does not occur when output files and input files are in the same directory. 
 
+ 1. All input file names must end in "Q20.txt" or "Q20threshold.txt"!
+ 	This makes sure that overwriting does not occur when output files and input files are in the same directory.
+	
  2. Each input file requires specific naming for grouping and plotting features. these will also be parsed for data table annotation.
-	e.g.: "~/pathto/myData/MouseA_plusTreatment_1-Q20.txt"
+	e.g.: "~/pathto/myData/MouseAplusTreatment_1-Q20.txt"
 
  3. For grouped passages:
  	In order for files to be grouped correctly in the plotting and analysis steps, files in directory must be labeled "MYHEADERTEXT_1-Q20.txt","HEADERTEXT_2-Q20.txt","HEADERTEXT_3-Q20.txt", those that do not match criteria are excluded from trajectory plots. Including MYHEADERTEXT is optional but useful for labeling if no header needed, "1-Q20.txt","2-Q20.txt","3-Q20.txt" is sufficient for grouping. 
