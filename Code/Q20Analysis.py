@@ -116,7 +116,7 @@ pechmann=[
 
 ##isSyn: translates and annotates codon substitution
 def isSyn(q20rows, p, subNT):
-	wt = [entry[1] for entry in q20rows[:]]
+	wt = [entry[1].lower() for entry in q20rows[:]]
 	wtCodon = "".join(wt)
 	
 	wtRes = codon_table[wtCodon]
@@ -151,7 +151,7 @@ def annotate(root,Q20file):
 
 	#begin nt annotation
 	posVector =   [row[0] for row in q20 for sub in ("a","c","g","t")]
-	wtNtVector  = [row[1] for row in q20 for sub in ("a","c","g","t")]
+	wtNtVector  = [row[1].lower() for row in q20 for sub in ("a","c","g","t")]
 	mutNtVector = [sub    for row in q20 for sub in ("a","c","g","t")]
 	coverage    = [ int(row[2])+int(row[3])+int(row[4])+int(row[5]) for row in q20 for sub in ("a","c","g","t") ]	
 	countVector = [ float(row[ntDict[sub]+2]) for row in q20 for sub in ("a","c","g","t") ]
@@ -311,6 +311,6 @@ else:
 				annotQ20=annotate(root,file)
 				print("...done.")
 				OF = outputFormat(root,file,annotQ20)
-				print("...done.")
+				print("...done.\n\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-\n")
 
 #combineQ20s(inputDir) #uncomment if combining q20counts !!!!! unstable !!!!

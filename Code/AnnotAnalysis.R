@@ -13,7 +13,7 @@ require(reshape2)
 args = commandArgs(trailingOnly=TRUE)
 rootDir<-args
 ########## plot frequencies ##########
-#rootDir="~/GitHub/CirQuestDSV/Hong/"
+#rootDir="~/GitHub/CirQuestDSV/DengueData/"#Can change input dir here if not using command line arg
 allq20<-NULL
 fileList<-list.files(recursive = T,paste(rootDir,sep = ""),pattern = 'annot.txt',full.names = T)
 if(length(fileList>0)){
@@ -28,14 +28,18 @@ if(length(fileList>0)){
     print(q20file)
     name<-strsplit2(strsplit2(q20file,"_annot.txt")[1],"/")
     L=length(name)
-    passage<-strsplit2(name[L],"-")[1]
-  
+    headString<-strsplit2(name[L],"-")[1] ## "..._1"
+    splitHead=strsplit2(headString,"_")
+    if(length(splitHead)>1){
+      headerInfo=paste(splitHead[1:(length(splitHead)-1)],collapse = " ")
+      passage=splitHead[length(splitHead)]
+    }
+    else{passage<-headerInfo<-splitHead}
     #Read File
     q20<-read.delim(q20file,head=T)
     #print(name)
     q20$passage<-as.numeric(passage)
     #Name Interpretation
-    headerInfo<-paste(name[L-2],collapse = "-")
     headLen=length(headerInfo)
     if(is.na(passage)){ #No passage info.
       print(paste("No passage info:", name))
@@ -43,12 +47,12 @@ if(length(fileList>0)){
       header<-headerInfo
     }else{if(headLen>0){
       print(paste("Header:", headerInfo, "Passage:", passage))
-      header<-headerInfo<-paste(c(headerInfo,passage),collapse = "-P")
+      header<-headerInfo
+      headerInfo<-paste(c(headerInfo,passage),collapse = "-P")
     }else{
       header="Sample"
       print(paste("No Header Info:",headerInfo,"Passage:", passage))
     } 
-      
     } 
     
     #labels
@@ -60,10 +64,11 @@ if(length(fileList>0)){
     q20$HsN[is.na(q20$HsN)]<-0.0
     
     filter<- q20[(q20$wtNT!=q20$mutNT)&q20$count>3,] #filter out WT and low counts(by binom)
+    q20$Conf<-q20$count<4
     allq20<- rbind(allq20,q20)
     save(list = "allq20",file =  paste(rootDir,"allq20.Rdata",sep = "/"))
     Q<-ggplot(q20[q20$wtNT!=q20$mutNT,])
-    
+
     ### Entropy
     Qh<-Q+geom_line(aes(ntpos,HsN),position = 'dodge',stat="identity")+
       ylab("Entropy")+xlab("Genome Position")
@@ -72,7 +77,7 @@ if(length(fileList>0)){
            device = 'pdf',Qh)
 
     PU<-Q+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+
-      geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn,alpha=count<3))+
+      geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn,alpha=Conf))+
       scale_alpha_discrete(range=c(.5,.1))+
       scale_size(range = c(0.2,3))+
       geom_text(cex=2,
@@ -94,37 +99,37 @@ if(length(fileList>0)){
   }
   
   #WholeDirectoryOutput
-  output<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes~header+passage,value.var = "freq")
-  outputCounts<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes~header+passage,value.var = "count")
-  outputCover<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes~header+passage,value.var = "coverage")
+  output<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "freq")
+  outputCounts<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "count")
+  outputCover<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "coverage")
   write.csv(file=paste(rootDir,outputDir,"DirFreqTable.csv",sep=""),output)
-  #maskedHeat<- d3heatmap::d3heatmap( output[ rowSums(output[,7:ncol(output)])>2, 7:ncol(output) ], labRow=
-  #                                 matrix(apply(output[ rowSums(output[,7:ncol(output)])>2, 1:6 ],MARGIN = 1,paste,collapse=".")))
-  if(ncol(output)>7){
-    masked<-output[ which(rowSums(output[,7:ncol(output)])<2),]
-    #Princomp
-    PCallq20<-prcomp(masked[,7:ncol(masked)])
   
-    Dist<-dist(t(masked[,7:ncol(masked)]),method = "man")
+  if(ncol(output)>8){
+    masked<-data.frame(na.omit(output[output$wtNT!=output$mutNT&output$wtRes!="U",]))
+    #Princomp
+    
+    PCallq20<-prcomp(masked[,8:ncol(masked)])
+  
+    Dist<-dist(t(masked[,8:ncol(masked)]),method = "euclidian")
+    
     distDF<-as.data.frame(cmdscale(Dist))
-    distDF<-data.frame(distDF,genotype=strsplit2(rownames(distDF),split = "_")[,3])
-    distDF$passage<-strsplit2(rownames(distDF),split="_")[,4]
-    PCDF<-data.frame(PCallq20$rotation,genotype=strsplit2(rownames(distDF),split = "Rep")[,1],passage=strsplit2(rownames(distDF),split="_")[,2])
-    ggplot(PCDF)+geom_point(aes(PC1,PC2,color=genotype))#+geom_text(aes(PC1,PC2,label=passage),nudge_x = -0.01)
-    ggplot(PCDF)+geom_point(aes(PC1,PC3,color=genotype))+geom_text(aes(PC1,PC3,label=))
-    mdsPlot<-ggplot(distDF)+geom_point(aes(V1,V2,color=genotype),alpha=0.5)+scale_color_brewer(palette="Paired")+geom_text(aes(V1,V2,label=passage),nudge_x = -0.1)
+    distDF$header<-strsplit2(rownames(distDF),split="\\.")[,1]
+    distDF$passage<-strsplit2(rownames(distDF),split="_")[,2]
+    mdsPlot<-ggplot(distDF)+geom_point(aes(V1,V2,color=header),alpha=0.5)+scale_color_brewer(palette="Paired")+geom_text(aes(V1,V2,label=passage))
     
-    ggsave(width=7, height=5,paste(rootDir,figureDir,"geneticDistPlot.pdf",sep=""),mdsPlot)
+    PCDF<-data.frame(PCallq20$rotation,header=strsplit2(rownames(distDF),split = "\\.")[,1],passage=strsplit2(rownames(distDF),split="_")[,2])
+    ggsave(ggplot(PCDF)+geom_point(aes(PC1,PC2,color=header))+geom_text(aes(PC1,PC2,label=passage),cex=2.5)+scale_color_brewer(palette="Paired"),filename = "PCPlot.pdf")
+    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"AllPop_PCA.pdf",sep=""),
+           ggplot(PCDF)+geom_point(aes(PC1,PC2,color=header))+
+           geom_text(aes(PC1,PC2,label=passage),cex=2.5)+
+           scale_color_brewer(palette="Paired"))
     
-    maskDF<-data.frame(masked)
-    
-    ggplot(maskDF)+geom_point(aes(ntpos,WTRep1_7),col="red")+geom_point(aes(ntpos,G64SD79HRep1_7))+scale_y_sqrt()+theme_classic()
-    ggplot(maskDF)+geom_point(aes(G64SD79HRep1_7,WTRep1_7),alpha=.8)+scale_x_sqrt(limits=c(0,.25))+scale_y_sqrt(limits=c(0,.25))
+    ggsave(width=7, height=5,paste(rootDir,figureDir,"geneticDistPlot_MDS.pdf",sep=""),mdsPlot)
     
     #Trajectories
     Qa<-ggplot(allq20[allq20$passage!=0,])
     
-    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,headerInfo,"Coverage.tiff",sep=""),
+    ggsave(width=10,height=8, filename = paste(rootDir,figureDir,headerInfo,"Coverage.tiff",sep=""),
            Qa+
              geom_point(aes(ntpos,coverage,color = factor(passage)),cex = 0.1)+
              geom_smooth(se = T,aes(ntpos,coverage,color=factor(passage)),color="black")+
@@ -159,5 +164,4 @@ if(length(fileList>0)){
     #Qa+geom_bar(aes(ntpos,HsN),position = "dodge",stat = "identity")+facet_grid(passage~header)
   print("\n\nCompleted Succesfully!\n\n")
     }
-}else{print("Error: No Files Found. Add as Arguments.")}
-
+}else{print("Error: No Files Found. Add as Arguments?")}
