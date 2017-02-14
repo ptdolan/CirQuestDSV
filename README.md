@@ -39,15 +39,15 @@ Current usage instructions:
     
 2. "AnnotAnalysis.R". This program reads a directory of annotated files and combines them to generate frequency plots, trajectory plots, it also performs dimension reduction analysis and outputs a number of useful output files. 
 
-with R installed: 
-	in command line: 
-		Rscript ./path/to/AnnotAnalysis.R ./pathto/q20annots/
+with R installed, in command line: 
+"""
+Rscript ./path/to/AnnotAnalysis.R ./pathto/q20annots/
 
-	or: 
-		R
-	then, in R: 
-		source("./path/to/AnnotAnalysis.R","./pathto/q20annots/)
-
+or: 
+> R
+then, in R: 
+> source("./path/to/AnnotAnalysis.R","./pathto/q20annots/)
+"""
 _-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 
