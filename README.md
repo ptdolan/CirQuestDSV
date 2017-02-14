@@ -32,7 +32,7 @@ Current usage instructions:
 
 1. Open a terminal in the same directory as the scripts and run: 
 
-    > python Q20Analysis.py <directory with q20 files> <translation start> <translation end> <next ORF start> <next ORF stop> and so on...
+    > python Q20Analysis.py \<directory with q20 files> \<translation start> \<translation end> \<next ORF start> \<next ORF stop> and so on...
 
     This generates an annotated q20 ("-q20annot.txt") file. You can stop here and use this annotated file for interpretation, or you can use this enhanced q20 to generate plots with the associated R script, "AnnotAnalysis.R". 
     
