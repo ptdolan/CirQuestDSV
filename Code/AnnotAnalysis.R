@@ -40,15 +40,14 @@ if(length(fileList>0)){
     #print(name)
     q20$passage<-as.numeric(passage)
     #Name Interpretation
-    headLen=length(headerInfo)
+    headLen=length(splitHead)
     if(is.na(passage)){ #No passage info.
       print(paste("No passage info:", name))
       passage<-0
       header<-headerInfo
-    }else{if(headLen>0){
+    }else{if(headLen>1){
       print(paste("Header:", headerInfo, "Passage:", passage))
       header<-headerInfo
-      headerInfo<-paste(c(headerInfo,passage),collapse = "-P")
     }else{
       header="Sample"
       print(paste("No Header Info:",headerInfo,"Passage:", passage))
