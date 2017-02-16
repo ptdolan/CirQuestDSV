@@ -13,7 +13,7 @@ require(reshape2)
 args = commandArgs(trailingOnly=TRUE)
 rootDir<-args
 ########## plot frequencies ##########
-#rootDir="~/GitHub/CirQuestDSV/DengueData/"#Can change input dir here if not using command line arg
+##rootDir="~/GitHub/CirQuestDSV/ExampleQfiles/"#Can change input dir here if not using command line arg
 allq20<-NULL
 fileList<-list.files(recursive = T,paste(rootDir,sep = ""),pattern = 'annot.txt',full.names = T)
 if(length(fileList>0)){
@@ -97,7 +97,7 @@ if(length(fileList>0)){
     write.csv(file=paste(rootDir,outputDir,headerInfo,"_",FILTER,"CO.csv",sep=""),filter[order(filter$freq,decreasing = T),])
   }
   
-  #WholeDirectoryOutput
+  #WholeDirectoryOutputs
   output<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "freq")
   outputCounts<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "count")
   outputCover<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "coverage")
@@ -107,33 +107,41 @@ if(length(fileList>0)){
     masked<-data.frame(na.omit(output[output$wtNT!=output$mutNT&output$wtRes!="U",]))
     #Princomp
     
-    PCallq20<-prcomp(masked[,8:ncol(masked)])
-  
-    Dist<-dist(t(masked[,8:ncol(masked)]),method = "euclidian")
     
-    distDF<-as.data.frame(cmdscale(Dist))
+#MDS
+    #Euclidian ("Taxi Cab") distance
+    DistE<-dist(t(masked[,8:ncol(masked)]),method = "euclidian")
+    distDF<-as.data.frame(cmdscale(DistE))
     distDF$header<-strsplit2(rownames(distDF),split="_")[,1]
     distDF$passage<-strsplit2(rownames(distDF),split="_")[,2]
-    mdsPlot<-ggplot(distDF)+geom_point(aes(V1,V2,color=header),alpha=0.5)+scale_color_brewer(palette="Paired")+geom_text(aes(V1,V2,label=passage))
+    mdsPlot<-ggplot(distDF)+geom_point(aes(V1,V2,color=header),alpha=0.5)+ggtitle("Euclidian Genetic Distance MDS")+xlab("Genetic Distance - Dim. 1")+ylab("Genetic Distance - Dim. 2")+scale_color_brewer(palette="Paired")+geom_text(aes(V1,V2,label=passage))
     
+    #Manhattan ("Taxi Cab") distance
+    DistM<-dist(t(masked[,8:ncol(masked)]),method = "manhattan")
+    distDF<-as.data.frame(cmdscale(DistM))
+    distDF$header<-strsplit2(rownames(distDF),split="_")[,1]
+    distDF$passage<-strsplit2(rownames(distDF),split="_")[,2]
+    mdsPlot<-ggplot(distDF)+geom_point(aes(V1,V2,color=header),alpha=0.5)+ggtitle("Manhattan Genetic Distance MDS")+xlab("Genetic Distance - Dim. 1")+ylab("Genetic Distance - Dim. 2")+scale_color_brewer(palette="Paired")+geom_text(aes(V1,V2,label=passage))
+    
+#PCA    
+    PCallq20<-prcomp(masked[,8:ncol(masked)])
     PCDF<-data.frame(PCallq20$rotation,header=strsplit2(rownames(distDF),split = "_")[,1],passage=strsplit2(rownames(distDF),split="_")[,2])
-    ggsave(ggplot(PCDF)+geom_point(aes(PC1,PC2,color=header))+geom_text(aes(PC1,PC2,label=passage),cex=2.5)+scale_color_brewer(palette="Paired"),filename = "PCPlot.pdf")
     ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"AllPop_PCA.pdf",sep=""),
            ggplot(PCDF)+geom_point(aes(PC1,PC2,color=header))+
            geom_text(aes(PC1,PC2,label=passage),cex=2.5)+
            scale_color_brewer(palette="Paired"))
     
-    ggsave(width=7, height=5,paste(rootDir,figureDir,"geneticDistPlot_MDS.pdf",sep=""),mdsPlot)
+    ggsave(width=6, height=4,paste(rootDir,figureDir,"geneticDistPlot_MDS.pdf",sep=""),mdsPlot)
     
     #Trajectories
     Qa<-ggplot(allq20[allq20$passage!=0,])
     
-    ggsave(width=10,height=8, filename = paste(rootDir,figureDir,headerInfo,"Coverage.tiff",sep=""),
+    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,headerInfo,"Coverage.tiff",sep=""),
            Qa+
              geom_point(aes(ntpos,coverage,color = factor(passage)),cex = 0.1)+
              geom_smooth(se = T,aes(ntpos,coverage,color=factor(passage)),color="black")+
              theme_classic()+ylab("Reads per position")+xlab("Genome Position")+
-             scale_color_brewer(palette = "Set1")+scale_color_brewer("seq",palette = "RdBu")+
+             scale_color_brewer(palette = "Set1")+scale_color_brewer("seq",palette = "Spectral")+
              scale_y_log10(limits=c(1,3e6))+facet_wrap(~header))
     
     TT<-Qa+geom_path( aes(passage,freq, group=ntID,colour=synNonsyn),alpha=0.4)+
@@ -161,6 +169,8 @@ if(length(fileList>0)){
     #          facet_grid(passage~header)
     # )
     #Qa+geom_bar(aes(ntpos,HsN),position = "dodge",stat = "identity")+facet_grid(passage~header)
-  print("\n\nCompleted Succesfully!\n\n")
+    print("")
+    print("Completed Succesfully!")
+    print("")
     }
 }else{print("Error: No Files Found. Add as Arguments?")}

@@ -280,7 +280,7 @@ def combineQ20s(inputDir):
 						for line in range(1,len(currentQ20)):
 							for i in [4,5]:
 								masterQ20[line][i] = masterQ20[line][i]+currentQ20[line][i]
-							masterQ20[line][6] = masterQ20[line][4]/masterQ20[line][5]
+							masterQ20[line][6] = float(masterQ20[line][4])/float(masterQ20[line][5])
 
 		with open(inputDir+"/master_"+filename,'w') as OF:
 			for row in masterQ20:
@@ -313,4 +313,4 @@ else:
 				OF = outputFormat(root,file,annotQ20)
 				print("...done.\n\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-\n")
 
-#combineQ20s(inputDir) #uncomment if combining q20counts !!!!! unstable !!!!
+combineQ20s(inputDir) #uncomment if combining q20counts !!!!! unstable !!!!
