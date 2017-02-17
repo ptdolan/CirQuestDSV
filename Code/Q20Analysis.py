@@ -260,7 +260,7 @@ def combineQ20s(inputDir):
 			if file [-9:] == 'annot.txt':
 				fileList.append(file)
 	uniqueFiles = set(fileList)
-	print(uniqueFiles)
+	#print(uniqueFiles)
 	for filename in uniqueFiles:
 		if filename.startswith("master")==False:
 			print ("..."+filename)
@@ -277,16 +277,14 @@ def combineQ20s(inputDir):
 						elif first==1:
 							with open(root+"/"+F,'r') as IF:
 								currentQ20 = [element for element in [line.strip().split("\t") for line in IF]]
-								print(currentQ20[150])
 							for line in range(1,len(currentQ20)):
 								for i in [5,6]:
 									masterQ20[line][i] = float(masterQ20[line][i])+float(currentQ20[line][i])
-									print(masterQ20[line])
+									#print(masterQ20[line])
 								try:
 									masterQ20[line][7] = masterQ20[line][5]/masterQ20[line][6]
 								except ZeroDivisionError:
-									print("Error")
-									masterQ20[line][7] = 0.0
+									masterQ20[line][7] = NaN
 			with open(inputDir+"/master_"+filename,'w') as OF:
 				for row in masterQ20:
 					count = 0
@@ -302,14 +300,13 @@ def combineQ20s(inputDir):
 
 inputDir = sys.argv[1]
 
-translationbreaks=list(sys.argv[2:]) #97 for DENV #10272 for DENV
+translationbreaks=list(sys.argv[2:])# 
 if(translationbreaks==[]):
 	print("No ORFs. Please add ORFs: 'python Q20Analysis.py <q20Dir>  <translationStart> <translationStop> '")
 
 else:
 	intervals=[[int(breaks)-1 for breaks in translationbreaks[i:i+2]] for i in range(0,len(translationbreaks),2)]
-	print("ORF Coordinates:")
-	print (intervals)
+	print("ORF Coordinates:"+str(intervals))
 	for root,dirs,files in os.walk(inputDir):
 		for file in files:
 			if file.endswith(("Q20threshold.txt","Q20.txt")):
