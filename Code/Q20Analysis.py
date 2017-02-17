@@ -140,8 +140,6 @@ def annotate(root,Q20file):
 	print ("Annotating:", Q20file)
 	with open(root+"/"+Q20file,'r') as IF:
 		q20 = [element for element in [line.strip().split("\t") for line in IF]]
-		if header == True:
-			q20 = q20[1:len(q20)]
 		print ("Length of input reference: "+str(len(q20)))
 	#define annotation columns and tables	
 	ntTable = []
@@ -262,36 +260,43 @@ def combineQ20s(inputDir):
 			if file [-9:] == 'annot.txt':
 				fileList.append(file)
 	uniqueFiles = set(fileList)
-
+	print(uniqueFiles)
 	for filename in uniqueFiles:
-		print ("..."+filename)
-		first = 0
-		for root,dirs,files in os.walk(inputDir):
-			for F in files:
-				if filename==F:
-					if first == 0: 
-						first = 1
-						print (filename)
-						with open(root+"/"+F,'r') as IF:
-							masterQ20 = [element for element in [line.strip().split("\t") for line in IF]]
-					elif first==1:
-						with open(root+"/"+F,'r') as IF:
-							currentQ20 = [element for element in [line.strip().split("\t") for line in IF]]
-						for line in range(1,len(currentQ20)):
-							for i in [4,5]:
-								masterQ20[line][i] = masterQ20[line][i]+currentQ20[line][i]
-							masterQ20[line][6] = float(masterQ20[line][4])/float(masterQ20[line][5])
-
-		with open(inputDir+"/master_"+filename,'w') as OF:
-			for row in masterQ20:
-				count = 0
-				for element in row:
-					count+=1
-					OF.write(str(element))
-					if count < len(row):
-						OF.write("\t")
-				OF.write("\n")
-			print ("wrote "+inputDir+"/master_"+filename)
+		if filename.startswith("master")==False:
+			print ("..."+filename)
+			first = 0
+			for root,dirs,files in os.walk(inputDir):
+				for F in files:
+					if filename==F:
+						if first == 0: 
+							first = 1
+							print (filename)
+							with open(root+"/"+F,'r') as IF:
+								masterQ20 = [element for element in [line.strip().split("\t") for line in IF]]
+								#print(masterQ20[150])
+						elif first==1:
+							with open(root+"/"+F,'r') as IF:
+								currentQ20 = [element for element in [line.strip().split("\t") for line in IF]]
+								print(currentQ20[150])
+							for line in range(1,len(currentQ20)):
+								for i in [5,6]:
+									masterQ20[line][i] = float(masterQ20[line][i])+float(currentQ20[line][i])
+									print(masterQ20[line])
+								try:
+									masterQ20[line][7] = masterQ20[line][5]/masterQ20[line][6]
+								except ZeroDivisionError:
+									print("Error")
+									masterQ20[line][7] = 0.0
+			with open(inputDir+"/master_"+filename,'w') as OF:
+				for row in masterQ20:
+					count = 0
+					for element in row:
+						count+=1
+						OF.write(str(element))
+						if count < len(row):
+							OF.write("\t")
+					OF.write("\n")
+				print ("wrote "+inputDir+"/master_"+filename)
 
 ############ MAIN ###############
 
