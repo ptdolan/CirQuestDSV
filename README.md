@@ -1,4 +1,3 @@
-![alt text](https://github.com/ptdolan/CirQuestDSV/blob/master/Misc/CirQuestLogo.png "Bathysphere Logo")
 <h1>CirQuestDSV</h1>
 <h3>ptdolan@stanford.edu</h3>
 ===========
