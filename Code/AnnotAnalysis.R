@@ -78,7 +78,7 @@ if(length(fileList>0)){
     PU<-Q+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+
       geom_point(aes(ntpos,freq,cex = freq,color=synNonsyn,alpha=Conf))+
       scale_alpha_discrete(range=c(.5,.1))+
-      scale_size(range = c(0.2,3))+
+      scale_size(range = c(0.25,2))+
       geom_text(cex=2,
                 data=q20[q20$wtNT!=q20$mutNT&q20$freq>FILTER,],
                 aes(ntpos,freq,label=ifelse(wtRes!="U",as.character(resID),as.character(ntID))))+
@@ -105,8 +105,6 @@ if(length(fileList>0)){
   
   if(ncol(output)>8){
     masked<-data.frame(na.omit(output[output$wtNT!=output$mutNT&output$wtRes!="U",]))
-    #Princomp
-    
     
 #MDS
     #Euclidian ("Taxi Cab") distance
