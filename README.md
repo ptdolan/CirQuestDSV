@@ -3,7 +3,7 @@
 ===========
 <h2>Description:</h2>
 
-This is a repository for code related to analysis of [Circular Resequencing data](https://www.ncbi.nlm.nih.gov/pubmed/27440878). Code is written in python and R. Original CirSeq paper is [here].(https://www.ncbi.nlm.nih.gov/pubmed/24284629).
+This is a repository for code related to analysis of [Circular Resequencing data](https://www.ncbi.nlm.nih.gov/pubmed/27440878). Code is written in python and R. Original CirSeq paper is [here](https://www.ncbi.nlm.nih.gov/pubmed/24284629).
 
 All code in this repository is intended for use downstream of Q-threshold count table generation by the [CirSeq software package](http://andino.ucsf.edu/toolsandprotocols).
 
