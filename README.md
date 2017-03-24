@@ -3,7 +3,7 @@
 ===========
 <h2>Description:</h2>
 
-This is a repository for code related to the analysis of [Circular Resequencing data](https://www.ncbi.nlm.nih.gov/pubmed/27440878). Code written in python and R.
+This is a repository for code related to analysis of [Circular Resequencing data](https://www.ncbi.nlm.nih.gov/pubmed/27440878). Code is written in python and R. Original CirSeq paper is [here](https://www.ncbi.nlm.nih.gov/pubmed/24284629).
 
 All code in this repository is intended for use downstream of Q-threshold count table generation by the [CirSeq software package](http://andino.ucsf.edu/toolsandprotocols).
 
@@ -40,7 +40,8 @@ R
 	e.g.: "~/pathto/myData/MouseAplusTreatment_1-Q20.txt"
 
  3. For grouped passages:
- 	In order for files to be grouped correctly in the plotting and analysis steps, files in directory must be labeled "MYHEADERTEXT_1-Q20.txt","HEADERTEXT_2-Q20.txt","HEADERTEXT_3-Q20.txt", those that do not match criteria are excluded from trajectory plots. Including MYHEADERTEXT is optional but useful for labeling if no header needed, "1-Q20.txt","2-Q20.txt","3-Q20.txt" is sufficient for grouping. 
+ 	In order for files to be grouped correctly in trajectory plots, files in directory must be labeled "MYHEADERTEXT_1-Q20.txt","HEADERTEXT_2-Q20.txt","HEADERTEXT_3-Q20.txt",..., where HEADERTEXT denotes any sample information (can include special characters (except "_" and "-"). 
+	**Those files that do not match criteria (passage number at a minimum) are excluded from trajectory plots. Including MYHEADERTEXT is optional but useful for labeling if no header needed, "1-Q20.txt","2-Q20.txt","3-Q20.txt" is sufficient for grouping. 
 
 <h3>Usage instructions:</h3>
 
