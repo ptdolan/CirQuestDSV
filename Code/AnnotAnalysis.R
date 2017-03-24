@@ -2,6 +2,7 @@
 #
 # AnnotAnalysis.R: For analysis and plotting of annotated q20file output from q20analysis.py . 
 # # Usage: commandline Rscript  /path/to/AnnotAnalysis.R /path/to/annotQ20DIR/ ##NOTE: not file. 
+#
 # # # # 
 print("Generating R plots and text outputs...")
 
@@ -107,9 +108,9 @@ if(length(fileList>0)){
     masked<-data.frame(na.omit(output[output$wtNT!=output$mutNT&output$wtRes!="U",]))
     #Princomp
     
-    
+#masked=#Some all integer DF 
 #MDS
-    #Euclidian ("Taxi Cab") distance
+    #Euclidian ("Crow's Flight") distance
     DistE<-dist(t(masked[,8:ncol(masked)]),method = "euclidian")
     distDF<-as.data.frame(cmdscale(DistE))
     distDF$header<-strsplit2(rownames(distDF),split="_")[,1]

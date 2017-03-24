@@ -284,7 +284,7 @@ def combineQ20s(inputDir):
 								try:
 									masterQ20[line][7] = masterQ20[line][5]/masterQ20[line][6]
 								except ZeroDivisionError:
-									masterQ20[line][7] = NaN
+									masterQ20[line][7] = np.nan
 			with open(inputDir+"/master_"+filename,'w') as OF:
 				for row in masterQ20:
 					count = 0
@@ -314,5 +314,4 @@ else:
 				print("...done.")
 				OF = outputFormat(root,file,annotQ20)
 				print("...done.\n\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-\n")
-
-combineQ20s(inputDir) #uncomment if combining q20counts !!!!! unstable !!!!
+	#combineQ20s(inputDir) #uncomment if combining q20counts !!!!! unstable !!!!
