@@ -14,7 +14,7 @@ require(reshape2)
 args = commandArgs(trailingOnly=TRUE)
 rootDir<-args
 ########## plot frequencies ##########
-##rootDir="~/GitHub/CirQuestDSV/ExampleQfiles/"#Can change input dir here if not using command line arg
+rootDir="~/Research/CirSeq/Hong/newcopiedset/"#Can change input dir here if not using command line arg
 allq20<-NULL
 fileList<-list.files(recursive = T,paste(rootDir,sep = ""),pattern = 'annot.txt',full.names = T)
 if(length(fileList>0)){
@@ -30,6 +30,7 @@ if(length(fileList>0)){
     name<-strsplit2(strsplit2(q20file,"_annot.txt")[1],"/")
     L=length(name)
     headString<-strsplit2(name[L],"-")[1] ## "..._1"
+    headString
     splitHead=strsplit2(headString,"_")
     if(length(splitHead)>1){
       headerInfo=paste(splitHead[1:(length(splitHead)-1)],collapse = " ")
@@ -40,6 +41,7 @@ if(length(fileList>0)){
     q20<-read.delim(q20file,head=T)
     #print(name)
     q20$passage<-as.numeric(passage)
+    q20$ORF<-as.factor(q20$ORF)
     #Name Interpretation
     headLen=length(splitHead)
     if(is.na(passage)){ #No passage info.
@@ -66,14 +68,14 @@ if(length(fileList>0)){
     filter<- q20[(q20$wtNT!=q20$mutNT)&q20$count>3,] #filter out WT and low counts(by binom)
     q20$Conf<-q20$count<4
     allq20<- rbind(allq20,q20)
-    save(list = "allq20",file =  paste(rootDir,"allq20.Rdata",sep = "/"))
+    
     Q<-ggplot(q20[q20$wtNT!=q20$mutNT,])
 
     ### Entropy
     Qh<-Q+geom_line(aes(ntpos,HsN),position = 'dodge',stat="identity")+
       ylab("Entropy")+xlab("Genome Position")
 
-    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"Entropy/",headerInfo,"_Entropy.pdf",sep=""),
+    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"Entropy/",headString,"_Entropy.pdf",sep=""),
            device = 'pdf',Qh)
 
     PU<-Q+geom_hline(aes(yintercept = FILTER),lty=3,color="grey")+
@@ -88,15 +90,16 @@ if(length(fileList>0)){
     
     PU+scale_y_log10(limits=c(10E-7,1))
 
-    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,headerInfo,"_log10_ManhattanPlot.pdf",sep=""),
+    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,headString,"_log10_ManhattanPlot.pdf",sep=""),
            device = 'pdf',PU+scale_y_log10(limits=c(10E-7,1))) #Edit here ("limits=c(10E-7,1)) for different fixed depth or delete for autoscaling
 
-    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,headerInfo,"_sqrt_ManhattanPlot.pdf",sep=""),
+    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,headString,"_sqrt_ManhattanPlot.pdf",sep=""),
            device = 'pdf',PU+scale_y_sqrt(limits=c(0,1),breaks=c(0,.001,.01,.05,.1,.2,.4,.6,.8,1)))
 
     ##### Write output table##########
-    write.csv(file=paste(rootDir,outputDir,headerInfo,"_",FILTER,"CO.csv",sep=""),filter[order(filter$freq,decreasing = T),])
+    write.csv(file=paste(rootDir,outputDir,headString,"_",FILTER,"CO.csv",sep=""),filter[order(filter$freq,decreasing = T),])
   }
+  save(list = "allq20",file =  paste(rootDir,"allq20.Rdata",sep = "/"))
   
   #WholeDirectoryOutputs
   output<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "freq")
@@ -170,8 +173,6 @@ if(length(fileList>0)){
     #          facet_grid(passage~header)
     # )
     #Qa+geom_bar(aes(ntpos,HsN),position = "dodge",stat = "identity")+facet_grid(passage~header)
-    print("")
-    print("Completed Succesfully!")
-    print("")
+    print("Completed Successfully!")
     }
 }else{print("Error: No Files Found. Add as Arguments?")}
