@@ -4,6 +4,7 @@
 # # Usage: commandline Rscript  /path/to/AnnotAnalysis.R /path/to/annotQ20DIR/ ##NOTE: not file. 
 #
 # # # # 
+
 print("Generating R plots and text outputs...")
 
 FILTER=0.005 # change for labeling
@@ -14,7 +15,7 @@ require(reshape2)
 args = commandArgs(trailingOnly=TRUE)
 rootDir<-args
 ########## plot frequencies ##########
-rootDir="~/Research/CirSeq/Hong/newcopiedset/"#Can change input dir here if not using command line arg
+#Can change input dir here if not using command line arg
 allq20<-NULL
 fileList<-list.files(recursive = T,paste(rootDir,sep = ""),pattern = 'annot.txt',full.names = T)
 if(length(fileList>0)){
@@ -33,15 +34,17 @@ if(length(fileList>0)){
     headString
     splitHead=strsplit2(headString,"_")
     if(length(splitHead)>1){
-      headerInfo=paste(splitHead[1:(length(splitHead)-1)],collapse = " ")
-      passage=splitHead[length(splitHead)]
+      headerInfo=paste(splitHead[2],collapse = " ")
+      passage=splitHead[3]
     }
     else{passage<-headerInfo<-splitHead}
     #Read File
     q20<-read.delim(q20file,head=T)
     #print(name)
-    q20$passage<-as.numeric(passage)
+    
     q20$ORF<-as.factor(q20$ORF)
+    
+    
     #Name Interpretation
     headLen=length(splitHead)
     if(is.na(passage)){ #No passage info.
@@ -50,6 +53,8 @@ if(length(fileList>0)){
       header<-headerInfo
     }else{if(headLen>1){
       print(paste("Header:", headerInfo, "Passage:", passage))
+      passNum<-as.numeric(strsplit2(passage,"p")[2])
+      print(passNum)
       header<-headerInfo
     }else{
       header="Sample"
@@ -57,6 +62,7 @@ if(length(fileList>0)){
     } 
     } 
     
+    passNum<-ifelse(is.na(passNum),0,passNum)
     #labels
     q20$name<-as.factor(headerInfo)
     q20$ntID<-as.factor(with(q20,paste( wtNT,ntpos,mutNT,sep="" )))
@@ -64,6 +70,7 @@ if(length(fileList>0)){
     q20$header<-as.factor(header)
     q20$HsN<-rep(unlist(by(q20$count,q20$ntpos,function(X){-sum(na.rm = T, (X/sum(X)) * log((X/sum(X)),base = 4))}[[1]]) ),each=4)
     q20$HsN[is.na(q20$HsN)]<-0.0
+    q20$passage<-passNum
     
     filter<- q20[(q20$wtNT!=q20$mutNT)&q20$count>3,] #filter out WT and low counts(by binom)
     q20$Conf<-q20$count<4
@@ -106,7 +113,7 @@ if(length(fileList>0)){
   outputCounts<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "count")
   outputCover<-dcast(data = allq20,formula = wtNT+ntpos+mutNT+wtRes+resPos+muRes+Conf~header+passage,value.var = "coverage")
   write.csv(file=paste(rootDir,outputDir,"DirFreqTable.csv",sep=""),output)
-  
+  print(head(output))
   if(ncol(output)>8){
     masked<-data.frame(na.omit(output[output$wtNT!=output$mutNT&output$wtRes!="U",]))
     #Princomp
@@ -143,7 +150,7 @@ if(length(fileList>0)){
     ggsave(width=6,height=4, filename = paste(rootDir,figureDir,headerInfo,"Coverage.tiff",sep=""),
            Qa+
              geom_point(aes(ntpos,coverage,color = factor(passage)),cex = 0.1)+
-             geom_smooth(se = T,aes(ntpos,coverage,color=factor(passage)),color="black")+
+             #geom_smooth(se = T,aes(ntpos,coverage,color=factor(passage)),color="black")+
              theme_classic()+ylab("Reads per position")+xlab("Genome Position")+
              scale_color_brewer(palette = "Set1")+scale_color_brewer("seq",palette = "Spectral")+
              scale_y_log10(limits=c(1,3e6))+facet_wrap(~header))
@@ -152,27 +159,19 @@ if(length(fileList>0)){
       theme_classic()+ylab("Frequency")+xlab("Passage")+scale_x_discrete()+
       scale_color_brewer(palette = "Set1")
     
-    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"dir_sqrt_TrajPlot.pdf",sep=""),
-           device = 'pdf',TT+scale_y_sqrt(breaks=c(0.00001,0.0001,.001,.01,.05,.1,.2,.4,.6,.8,1))+facet_wrap(ORF~header))
-    
-    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"dir_log_TrajPlot.pdf",sep=""),
+    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"dir_sqrt_TrajPlot.tiff",sep=""),
+         device = 'pdf',TT+scale_y_sqrt()+facet_wrap(ORF~header))
+
+    ggsave(width=6,height=4, filename = paste(rootDir,figureDir,"dir_log_TrajPlot.tiff",sep=""),
            device = 'pdf',TT+scale_y_log10(breaks=c(10**c(-6:0)))+facet_wrap(ORF~header))
     
-    #Qa+geom_bar(aes(ntpos,HsN),position = "dodge",stat = "identity")+facet_grid(passage~header)
-    ggsave(filename = paste(rootDir,figureDir,"allFreqPlots.tiff",sep=""),dpi = 300,width = 7.2,height = 9.8,
-           Qa+geom_point(aes(ntpos,freq,color=synNonsyn,alpha=count>3),cex=0.3)+
-             scale_alpha_discrete(range=c(0.1,0.5))+
+    ggsave(filename = paste(rootDir,figureDir,"allFreqPlots.tiff",sep=""),dpi = 300,width = 7.2,height = 9.8,Qa+geom_point(aes(ntpos,freq,color=synNonsyn,alpha=count>3),cex=0.3)+
              scale_y_log10()+
              facet_grid(passage~header)
     )
     
-    # ggsave(filename = paste(rootDir,figureDir,"allFreqPlots.",sep=""),width = 7.2,height = 9.8,
-    #        Qa+geom_point(aes(ntpos,freq,color=synNonsyn,alpha=count>3),cex=0.3)+
-    #          scale_alpha_discrete(range=c(0.1,0.5))+
-    #          scale_y_log10()+
-    #          facet_grid(passage~header)
-    # )
-    #Qa+geom_bar(aes(ntpos,HsN),position = "dodge",stat = "identity")+facet_grid(passage~header)
+    
+    
     print("Completed Successfully!")
     }
 }else{print("Error: No Files Found. Add as Arguments?")}

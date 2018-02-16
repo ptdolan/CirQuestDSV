@@ -138,9 +138,14 @@ def isSyn(q20rows, p, subNT):
 ## annotate: mainfunction for formatting q20 files
 def annotate(root,Q20file):
 	print ("Annotating:", Q20file)
+	hdr=True
 	with open(root+"/"+Q20file,'r') as IF:
 		q20 = [element for element in [line.strip().split("\t") for line in IF]]
 		print ("Length of input reference: "+str(len(q20)))
+		if type (q20[0][1]) is str:
+			hdr=True
+			q20=q20[1::]
+
 	#define annotation columns and tables	
 	ntTable = []
 	codTable = []
@@ -309,7 +314,7 @@ else:
 	print("ORF Coordinates:"+str(intervals))
 	for root,dirs,files in os.walk(inputDir):
 		for file in files:
-			if file.endswith(("Q20threshold.txt","Q20.txt")):
+			if file.endswith(("Q20threshold.txt","Q20.txt","phred20_consensus.txt")):
 				annotQ20=annotate(root,file)
 				print("...done.")
 				OF = outputFormat(root,file,annotQ20)
